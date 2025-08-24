@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Beatmania Clone - 午前四時の宮殿</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div id="game-container">
+        <div id="mv-background">
+            <video id="music-video" muted loop>
+                <source src="assets/video/MusicVideo.mp4" type="video/mp4">
+            </video>
+            <div id="mv-overlay"></div>
+        </div>
+        <div id="game-screen">
+            <div id="judgment-line"></div>
+            <div id="note-field">
+                <div class="lane" data-lane="0"></div>
+                <div class="lane" data-lane="1"></div>
+                <div class="lane" data-lane="2"></div>
+                <div class="lane" data-lane="3"></div>
+                <div class="lane" data-lane="4"></div>
+                <div class="lane" data-lane="5"></div>
+            </div>
+            <div id="key-display">
+                <div class="key white" data-key="0">A</div>
+                <div class="key black" data-key="1">S</div>
+                <div class="key white" data-key="2">D</div>
+                <div class="key black" data-key="3">G</div>
+                <div class="key white" data-key="4">H</div>
+                <div class="key black" data-key="5">J</div>
+            </div>
+        </div>
+        <div id="info-panel">
+            <div id="audio-notice" style="background: rgba(255,100,100,0.8); padding: 10px; border-radius: 5px; margin-bottom: 15px; font-size: 12px;">
+                <strong>音声再生について:</strong><br>
+                初回起動時は音楽が自動再生されない場合があります。<br>
+                その場合は2回目のSTARTで正常に動作します。
+            </div>
+            <div id="score">SCORE: <span id="score-value">0</span></div>
+            <div id="combo">COMBO: <span id="combo-value">0</span></div>
+            <div id="judge-display"></div>
+            <div id="controls">
+                <div id="song-select">
+                    <label for="song-choice">楽曲選択:</label>
+                    <select id="song-choice">
+                        <option value="gozen4ji">午前四時の宮殿</option>
+                        <option value="cryinggirl">クライングガール</option>
+                        <option value="custom">カスタム譜面</option>
+                    </select>
+                </div>
+                <div id="custom-chart-section" style="display: none;">
+                    <label for="custom-chart-file">譜面ファイル:</label>
+                    <input type="file" id="custom-chart-file" accept=".json" multiple>
+                    <small>4つの難易度ファイルを選択してください</small>
+                </div>
+                <div id="difficulty-select">
+                    <label for="difficulty">難易度:</label>
+                    <select id="difficulty">
+                        <option value="beginner">BEGINNER (3)</option>
+                        <option value="normal" selected>NORMAL (5)</option>
+                        <option value="hyper">HYPER (8)</option>
+                        <option value="another">ANOTHER (11)</option>
+                    </select>
+                </div>
+                <div id="mv-controls">
+                    <label>
+                        <input type="checkbox" id="mv-enabled" checked> MV表示
+                    </label>
+                    <div id="mv-opacity">
+                        <label for="mv-opacity-slider">MV透明度:</label>
+                        <input type="range" id="mv-opacity-slider" min="0" max="100" value="60">
+                    </div>
+                </div>
+                <div id="editor-link">
+                    <a href="chart-editor.html" class="editor-btn">譜面エディタを開く</a>
+                </div>
+                <button id="start-btn">START</button>
+                <button id="stop-btn" disabled>STOP</button>
+            </div>
+        </div>
+    </div>
+    <audio id="game-audio"></audio>
+    <script src="js/game.js"></script>
+</body>
+</html>

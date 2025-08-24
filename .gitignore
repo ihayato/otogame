@@ -1,0 +1,29 @@
+# Large media files
+assets/video/*.mp4
+assets/video/*.mov
+assets/video/*.avi
+
+# Audio files (can be large)
+assets/sounds/*.mp3
+assets/sounds/*.wav
+assets/sounds/*.ogg
+
+# System files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Development files
+venv/
+__pycache__/
+*.pyc
+*.pyo
+
+# Temporary files
+*.tmp
+*.temp
+*~

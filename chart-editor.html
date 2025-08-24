@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>譜面エディタ - Chart Editor</title>
+    <link rel="stylesheet" href="css/editor.css">
+</head>
+<body>
+    <div id="editor-container">
+        <header id="editor-header">
+            <h1>譜面エディタ</h1>
+            <nav>
+                <a href="index.html" class="nav-btn">ゲームに戻る</a>
+            </nav>
+        </header>
+        
+        <div id="editor-main">
+            <div id="audio-section">
+                <h2>楽曲設定</h2>
+                <div class="input-group">
+                    <label for="song-file">楽曲ファイル:</label>
+                    <input type="file" id="song-file" accept=".mp3,.wav,.ogg" />
+                </div>
+                <div class="input-group">
+                    <label for="song-title">楽曲名:</label>
+                    <input type="text" id="song-title" placeholder="楽曲名を入力" />
+                </div>
+                <div class="input-group">
+                    <label for="song-artist">アーティスト:</label>
+                    <input type="text" id="song-artist" placeholder="アーティスト名を入力" />
+                </div>
+                <div class="input-group">
+                    <label for="song-bpm">BPM:</label>
+                    <input type="number" id="song-bpm" value="120" min="60" max="200" />
+                </div>
+                <div class="input-group">
+                    <label for="song-offset">オフセット (秒):</label>
+                    <input type="number" id="song-offset" value="0" step="0.1" />
+                </div>
+            </div>
+            
+            <div id="recording-section">
+                <h2>タイミング記録</h2>
+                <div id="record-controls">
+                    <button id="record-btn" disabled>記録開始 (スペースキーでタイミング記録)</button>
+                    <button id="stop-record-btn" disabled>記録停止</button>
+                    <button id="clear-record-btn">記録クリア</button>
+                </div>
+                <div id="record-status">
+                    <div id="current-time">楽曲時間: 0.00s</div>
+                    <div id="recorded-count">記録済み: 0回</div>
+                    <div id="last-tap">最後のタップ: -</div>
+                </div>
+                <div id="visual-feedback">
+                    <div id="tap-indicator"></div>
+                </div>
+            </div>
+            
+            <div id="difficulty-section">
+                <h2>難易度設定</h2>
+                <div class="difficulty-config">
+                    <h3>BEGINNER</h3>
+                    <div class="input-group">
+                        <label>ノーツ密度:</label>
+                        <input type="range" id="beginner-density" min="20" max="50" value="30">
+                        <span id="beginner-density-value">30%</span>
+                    </div>
+                    <div class="input-group">
+                        <label>同時押し:</label>
+                        <select id="beginner-chord">
+                            <option value="0">なし</option>
+                            <option value="1">稀に2個</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="difficulty-config">
+                    <h3>NORMAL</h3>
+                    <div class="input-group">
+                        <label>ノーツ密度:</label>
+                        <input type="range" id="normal-density" min="40" max="70" value="60">
+                        <span id="normal-density-value">60%</span>
+                    </div>
+                    <div class="input-group">
+                        <label>同時押し:</label>
+                        <select id="normal-chord">
+                            <option value="0">なし</option>
+                            <option value="1">稀に2個</option>
+                            <option value="2">時々2個</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="difficulty-config">
+                    <h3>HYPER</h3>
+                    <div class="input-group">
+                        <label>ノーツ密度:</label>
+                        <input type="range" id="hyper-density" min="60" max="90" value="80">
+                        <span id="hyper-density-value">80%</span>
+                    </div>
+                    <div class="input-group">
+                        <label>同時押し:</label>
+                        <select id="hyper-chord">
+                            <option value="1">稀に2個</option>
+                            <option value="2">時々2個</option>
+                            <option value="3">時々3個</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="difficulty-config">
+                    <h3>ANOTHER</h3>
+                    <div class="input-group">
+                        <label>ノーツ密度:</label>
+                        <input type="range" id="another-density" min="80" max="100" value="95">
+                        <span id="another-density-value">95%</span>
+                    </div>
+                    <div class="input-group">
+                        <label>同時押し:</label>
+                        <select id="another-chord">
+                            <option value="2">時々2個</option>
+                            <option value="3">時々3個</option>
+                            <option value="4">頻繁に3個</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="output-section">
+                <h2>譜面出力</h2>
+                <button id="generate-btn" disabled>譜面生成</button>
+                <button id="preview-btn" disabled>プレビュー</button>
+                <button id="download-btn" disabled>ダウンロード</button>
+                <div id="generation-status"></div>
+            </div>
+        </div>
+    </div>
+    
+    <audio id="editor-audio" controls></audio>
+    
+    <div id="preview-modal" style="display: none;">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h3>譜面プレビュー</h3>
+            <div id="preview-info"></div>
+            <div id="preview-timeline"></div>
+        </div>
+    </div>
+    
+    <script src="js/chart-editor.js"></script>
+</body>
+</html>

@@ -1,0 +1,43 @@
+{
+  "title": "午前四時の宮殿",
+  "artist": "Unknown",
+  "bpm": 128,
+  "offset": 0.5,
+  "audioFile": "../sounds/gozen4ji.mp3",
+  "difficulty": {
+    "name": "NORMAL",
+    "level": 5
+  },
+  "notes": [
+    {"time": 2.0, "lane": 0, "type": "tap"},
+    {"time": 2.5, "lane": 2, "type": "tap"},
+    {"time": 3.0, "lane": 4, "type": "tap"},
+    {"time": 3.5, "lane": 6, "type": "tap"},
+    {"time": 4.0, "lane": 7, "type": "scratch"},
+    {"time": 4.5, "lane": 1, "type": "tap"},
+    {"time": 5.0, "lane": 3, "type": "tap"},
+    {"time": 5.5, "lane": 5, "type": "tap"},
+    {"time": 6.0, "lane": 0, "type": "hold", "duration": 1.0},
+    {"time": 6.5, "lane": 4, "type": "tap"},
+    {"time": 7.0, "lane": 2, "type": "tap"},
+    {"time": 7.5, "lane": 6, "type": "tap"},
+    {"time": 8.0, "lane": 7, "type": "scratch"},
+    {"time": 8.25, "lane": 1, "type": "tap"},
+    {"time": 8.5, "lane": 3, "type": "tap"},
+    {"time": 8.75, "lane": 5, "type": "tap"},
+    {"time": 9.0, "lane": 0, "type": "tap"},
+    {"time": 9.0, "lane": 6, "type": "tap"},
+    {"time": 9.5, "lane": 2, "type": "tap"},
+    {"time": 9.5, "lane": 4, "type": "tap"},
+    {"time": 10.0, "lane": 1, "type": "hold", "duration": 0.5},
+    {"time": 10.0, "lane": 5, "type": "hold", "duration": 0.5},
+    {"time": 10.5, "lane": 7, "type": "scratch"},
+    {"time": 11.0, "lane": 0, "type": "tap"},
+    {"time": 11.25, "lane": 2, "type": "tap"},
+    {"time": 11.5, "lane": 4, "type": "tap"},
+    {"time": 11.75, "lane": 6, "type": "tap"},
+    {"time": 12.0, "lane": 1, "type": "tap"},
+    {"time": 12.0, "lane": 3, "type": "tap"},
+    {"time": 12.0, "lane": 5, "type": "tap"}
+  ]
+}
