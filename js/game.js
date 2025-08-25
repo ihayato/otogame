@@ -74,16 +74,11 @@ class BeatmaniaGame {
     }
     
     initMVControls() {
-        const mvEnabledCheckbox = document.getElementById('mv-enabled');
-        const mvOpacitySlider = document.getElementById('mv-opacity-slider');
-        
-        mvEnabledCheckbox.addEventListener('change', (e) => {
-            this.video.style.display = e.target.checked ? 'block' : 'none';
-        });
-        
-        mvOpacitySlider.addEventListener('input', (e) => {
-            this.video.style.opacity = e.target.value / 100;
-        });
+        // MV controls are removed, video is always displayed
+        if (this.video) {
+            this.video.style.display = 'block';
+            this.video.style.opacity = '0.3';
+        }
     }
     
     initCustomCharts() {
@@ -161,7 +156,11 @@ class BeatmaniaGame {
                 }
                 
                 console.log('JSONパース開始');
-                this.chartData = await response.json();
+                const text = await response.text();
+                console.log(`Response text length: ${text.length}`);
+                console.log(`Response first 100 chars: ${text.substring(0, 100)}`);
+                
+                this.chartData = JSON.parse(text);
                 console.log('JSONパース完了');
                 this.audio.src = this.chartData.audioFile;
                 
@@ -188,6 +187,13 @@ class BeatmaniaGame {
             if (!this.chartData) {
                 throw new Error('譜面データの読み込みに失敗しました');
             }
+            
+            console.log('譜面データ確認:', {
+                title: this.chartData.title,
+                difficulty: this.chartData.difficulty,
+                notesCount: this.chartData.notes.length,
+                firstNote: this.chartData.notes[0]
+            });
             
             console.log('UIを更新');
             document.getElementById('start-btn').disabled = true;
@@ -226,11 +232,10 @@ class BeatmaniaGame {
                         return;
                     }
                     
-                    if (document.getElementById('mv-enabled').checked) {
-                        console.log('MV再生を開始');
-                        this.video.currentTime = 0;
-                        this.video.play().catch(e => console.error('MV再生エラー:', e));
-                    }
+                    // MV再生を常に開始
+                    console.log('MV再生を開始');
+                    this.video.currentTime = 0;
+                    this.video.play().catch(e => console.error('MV再生エラー:', e));
                     
                     this.startTime = performance.now() - (this.chartData.offset * 1000);
                     console.log(`ゲーム開始時刻設定: ${this.startTime}`);
@@ -279,7 +284,19 @@ class BeatmaniaGame {
     }
     
     spawnNotes() {
-        this.chartData.notes.forEach(noteData => {
+        console.log(`spawnNotes開始: ${this.chartData.notes.length}個のノーツデータ`);
+        
+        // レーンの存在確認
+        for (let i = 0; i < 6; i++) {
+            const lane = document.querySelector(`.lane[data-lane="${i}"]`);
+            console.log(`Lane ${i} exists:`, !!lane);
+        }
+        
+        this.chartData.notes.forEach((noteData, index) => {
+            if (index < 10) { // 最初の10個だけ詳細ログ
+                console.log(`Note ${index}: time=${noteData.time}, lane=${noteData.lane}, type=${noteData.type}`);
+            }
+            
             const note = {
                 time: noteData.time,
                 lane: noteData.lane,
@@ -291,11 +308,19 @@ class BeatmaniaGame {
             };
             this.notes.push(note);
         });
+        
+        console.log(`spawnNotes完了: ${this.notes.length}個のノーツオブジェクト生成`);
+        
+        // DOM内のノーツ要素を確認
+        const noteElements = document.querySelectorAll('.note');
+        console.log(`DOM内のノーツ要素数: ${noteElements.length}`);
     }
     
     createNoteElement(noteData) {
         const note = document.createElement('div');
         note.className = 'note';
+        console.log(`Creating note element for lane ${noteData.lane}`);
+        
         if (noteData.lane === 7) {
             note.classList.add('scratch-note');
         }
@@ -305,7 +330,25 @@ class BeatmaniaGame {
         }
         
         const lane = document.querySelector(`.lane[data-lane="${noteData.lane}"]`);
-        lane.appendChild(note);
+        console.log(`Lane element found for lane ${noteData.lane}:`, !!lane);
+        
+        if (lane) {
+            // 初期位置を設定
+            note.style.position = 'absolute';
+            note.style.bottom = '-50px'; // 画面外から開始
+            note.style.width = '100%';
+            note.style.height = '30px';
+            note.style.backgroundColor = '#fff';
+            note.style.border = '2px solid #fff';
+            note.style.boxShadow = '0 0 10px rgba(255, 255, 255, 0.5)';
+            note.style.zIndex = '15'; // より高いz-indexに設定
+            
+            lane.appendChild(note);
+            console.log(`Note element added to lane ${noteData.lane}, zIndex: ${note.style.zIndex}`);
+        } else {
+            console.error(`Lane not found for lane ${noteData.lane}`);
+            console.log('Available lanes:', document.querySelectorAll('.lane').length);
+        }
         
         return note;
     }
@@ -316,11 +359,28 @@ class BeatmaniaGame {
         const currentTime = (performance.now() - this.startTime) / 1000;
         const judgmentY = window.innerHeight - 100;
         
-        this.notes.forEach(note => {
+        // 最初の数秒間だけデバッグログを出力
+        if (currentTime < 5 && currentTime > 0) {
+            console.log(`GameLoop: currentTime=${currentTime.toFixed(2)}, activeNotes=${this.notes.filter(n => !n.hit).length}`);
+        }
+        
+        this.notes.forEach((note, index) => {
             if (!note.hit) {
                 const timeDiff = currentTime - note.time;
                 note.y = judgmentY - (timeDiff * -200 * this.noteSpeed);
-                note.element.style.bottom = `${window.innerHeight - note.y - 100}px`;
+                const bottomPos = window.innerHeight - note.y - 100;
+                note.element.style.bottom = `${bottomPos}px`;
+                
+                // 最初のノーツの詳細ログ
+                if (index === 0 && currentTime < 25) {
+                    console.log(`Note 0: time=${note.time}, currentTime=${currentTime.toFixed(2)}, timeDiff=${timeDiff.toFixed(2)}, y=${note.y.toFixed(2)}, bottom=${bottomPos.toFixed(2)}px`);
+                    console.log(`Note element exists:`, !!note.element, `Element parent:`, note.element.parentElement);
+                }
+                
+                // ノーツが画面に表示される範囲かチェック
+                if (index === 0 && bottomPos > -50 && bottomPos < window.innerHeight + 50) {
+                    console.log(`Note 0 should be visible! bottom=${bottomPos.toFixed(2)}px`);
+                }
                 
                 if (timeDiff > this.judgmentTiming.poor) {
                     this.missNote(note);

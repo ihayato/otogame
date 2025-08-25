@@ -2,6 +2,7 @@ class ChartEditor {
     constructor() {
         this.audio = document.getElementById('editor-audio');
         this.isRecording = false;
+        this.isWaitingForStart = false;
         this.recordedTimings = [];
         this.startTime = 0;
         this.songData = {
@@ -35,7 +36,7 @@ class ChartEditor {
         });
         
         // 記録制御
-        document.getElementById('record-btn').addEventListener('click', () => this.startRecording());
+        document.getElementById('record-btn').addEventListener('click', () => this.prepareRecording());
         document.getElementById('stop-record-btn').addEventListener('click', () => this.stopRecording());
         document.getElementById('clear-record-btn').addEventListener('click', () => this.clearRecording());
         
@@ -77,23 +78,32 @@ class ChartEditor {
         this.updateStatus('楽曲ファイルが読み込まれました。記録を開始できます。');
     }
     
-    startRecording() {
+    prepareRecording() {
         if (!this.audio.src) {
             alert('まず楽曲ファイルを選択してください。');
             return;
         }
         
-        this.isRecording = true;
+        this.isWaitingForStart = true;
         this.recordedTimings = [];
-        this.startTime = performance.now();
         
         // UI更新
         document.getElementById('record-btn').disabled = true;
         document.getElementById('stop-record-btn').disabled = false;
         document.getElementById('generate-btn').disabled = true;
         
-        // 楽曲再生
+        // 楽曲を開始位置にセット
         this.audio.currentTime = 0;
+        
+        console.log('記録準備完了');
+        this.updateStatus('スペースキーを押すと再生と記録を開始します...');
+    }
+    
+    startRecording() {
+        this.isRecording = true;
+        this.startTime = performance.now();
+        
+        // 楽曲再生
         this.audio.play();
         
         this.updateRecordingStatus();
@@ -103,6 +113,7 @@ class ChartEditor {
     
     stopRecording() {
         this.isRecording = false;
+        this.isWaitingForStart = false;
         this.audio.pause();
         
         // UI更新
@@ -126,9 +137,17 @@ class ChartEditor {
     }
     
     handleKeyDown(event) {
-        if (event.code === 'Space' && this.isRecording) {
+        if (event.code === 'Space') {
             event.preventDefault();
-            this.recordTiming();
+            
+            if (this.isWaitingForStart) {
+                // 最初のスペースキーで再生と記録を開始
+                this.startRecording();
+                this.isWaitingForStart = false;
+            } else if (this.isRecording) {
+                // 2回目以降のスペースキーは記録
+                this.recordTiming();
+            }
         }
     }
     
@@ -331,6 +350,27 @@ class ChartEditor {
             return;
         }
         
+        // 完全な記録データを保存
+        const rawRecording = {
+            title: this.songData.title || 'Untitled',
+            artist: this.songData.artist || 'Unknown',
+            bpm: this.songData.bpm,
+            offset: this.songData.offset,
+            audioFile: this.songData.audioFile,
+            recordedTimings: this.recordedTimings,
+            recordedAt: new Date().toISOString(),
+            totalTimings: this.recordedTimings.length
+        };
+        
+        const rawDataStr = JSON.stringify(rawRecording, null, 2);
+        const rawDataBlob = new Blob([rawDataStr], {type: 'application/json'});
+        
+        const rawLink = document.createElement('a');
+        rawLink.href = URL.createObjectURL(rawDataBlob);
+        rawLink.download = `${this.songData.title || 'chart'}_raw_recording.json`;
+        rawLink.click();
+        
+        // 各難易度の譜面をダウンロード
         Object.keys(this.generatedCharts).forEach(difficulty => {
             const chart = this.generatedCharts[difficulty];
             const dataStr = JSON.stringify(chart, null, 2);
@@ -342,8 +382,8 @@ class ChartEditor {
             link.click();
         });
         
-        console.log('全ての譜面をダウンロードしました');
-        this.updateStatus('譜面ファイルをダウンロードしました！');
+        console.log('全ての譜面と完全な記録データをダウンロードしました');
+        this.updateStatus('譜面ファイルと完全な記録データをダウンロードしました！');
     }
     
     updateStatus(message) {
